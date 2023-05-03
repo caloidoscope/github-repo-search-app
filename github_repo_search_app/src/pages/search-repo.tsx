@@ -1,43 +1,53 @@
-import { useState } from 'react'
-import SearchBar from '../components/SearchBar'
-import Card from '../components/Card'
+import React, { useState } from 'react';
+import SearchBar from '../components/SearchBar';
+import Card from '../components/Card';
+import { Repository, SearchUser } from '@/graphql/types';
+import { GetServerSideProps } from 'next';
+import FilterBar from '@/components/FilterBar';
 
-const results = [
-    {
-        title: 'Repo 1',
-        description: 'This is the first card.',
-    },
-    {
-        title: 'Repo 2',
-        description: 'This is the second card.',
-    },
-    {
-        title: 'Repo 3',
-        description: 'This is the third card.',
-    },
-]
-
-export default function SearchResults() {
-    const [query, setQuery] = useState('')
-    const [filteredResults, setFilteredResults] = useState(results)
-    
-    function handleSearch(query: string) {
-        setQuery(query)
-        setFilteredResults(
-            results.filter((result) =>
-            result.title.toLowerCase().includes(query.toLowerCase())
-            )
-            )
-        }
-        
-    return (
-        <div className="max-w-3xl mx-auto my-8 px-4">
-            <SearchBar onChange={handleSearch} />
-            <div className="mt-4">
-            {filteredResults.map((result, index) => (
-                <Card key={index} title={result.title} description={result.description} />
-                ))}
-                </div>
-            </div>
-    )
+interface HomeProps {
+  repositories?: Repository[];
 }
+
+const Home: React.FC<HomeProps> = ({ repositories: initialRepositories }) => {
+    const [searchedUsername, setSearchedUsername] = useState<string>('');
+    const [repositories, setRepositories] = useState<Repository[]>(initialRepositories || []);
+    const [filterQuery, setFilterQuery] = useState<string>('');
+    const handleOnSearch = (repositories: Repository[], username: string): void =>{
+        setSearchedUsername(username)
+        setRepositories(repositories)
+    }
+
+    const onFilter = (_filterQuery: string): void => {
+        setFilterQuery(_filterQuery)
+    }
+
+    return (
+        <div className="container mx-auto mt-4 px-4">
+        <SearchBar onSearchComplete={handleOnSearch} onSubmit={()=>setRepositories([])}/>
+        {repositories.length>0 && (
+            <>
+                <FilterBar onFilter={onFilter} />
+                <div className="mt-8">
+                    <h2 className="text-2xl font-bold mb-4">{repositories.length} repositories for {searchedUsername}</h2>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                        {repositories.filter(repo=>repo.name.includes(filterQuery)).map((repo) => (
+                            <Card key={repo.id} repository={repo} />
+                        ))}
+                    </div>
+                </div>
+            </>
+        )}
+        </div>
+    );
+};
+
+export default Home;
+
+export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
+  return {
+    props: {
+      repositories: []
+    }
+  };
+};
