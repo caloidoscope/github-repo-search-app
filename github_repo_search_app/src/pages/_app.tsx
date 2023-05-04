@@ -3,9 +3,9 @@ import { ApolloProvider } from '@apollo/client'
 import { MantineProvider } from '@mantine/core'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
-import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import { useApollo } from '@/graphql/apollo-client'
+import { config } from '@fortawesome/fontawesome-svg-core'
 config.autoAddCss = false
 
 export default function App({ Component, pageProps }: AppProps) {

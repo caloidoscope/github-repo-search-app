@@ -1,44 +1,15 @@
-import { useMemo } from 'react';
-import { ApolloClient, InMemoryCache, NormalizedCacheObject, createHttpLink } from '@apollo/client';
+import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
-import { HttpLink } from '@apollo/client/link/http';
+import { useMemo } from 'react';
 
 let apolloClient: ApolloClient<NormalizedCacheObject>;
 const token = process.env.GITHUB_PERSONAL_ACCESS_TOKEN
 
-export const apolloClientStatic = () =>{
-    return new ApolloClient({
-    cache: new InMemoryCache(),
-    link: new HttpLink({
-      uri: 'https://api.github.com/graphql',
-      headers: {
-          authorization: `Bearer ${token}`,
-      },
-      fetchOptions: {
-        timeout: 30000, // 30 seconds
-      },
-    })
-  });
-}
 export function createApolloClient() {
-  // return new ApolloClient({
-  //   ssrMode: true,
-  //   cache: new InMemoryCache(),
-  //   link: new HttpLink({
-  //   uri: 'https://api.github.com/graphql',
-  //   headers: {
-  //       authorization: `Bearer ${token}`,
-  //   }
-  // })
-  // });
   return new ApolloClient({
+    ssrMode: true,
     cache: new InMemoryCache(),
     link: authLink.concat(httpLink),
-    defaultOptions: {
-      query: {
-        fetchPolicy: 'no-cache',
-      },
-    },
   });
 }
 
@@ -51,7 +22,10 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 const httpLink = createHttpLink({
-  uri: 'https://api.github.com/graphql'
+  uri: 'https://api.github.com/graphql',
+  fetchOptions: {
+    timeout: 30000
+  }
 });
 
 

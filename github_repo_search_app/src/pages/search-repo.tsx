@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SearchBar from '../components/SearchBar';
 import Card from '../components/Card';
-import { Repository, SearchUser } from '@/graphql/types';
+import { Repository } from '@/graphql/types';
 import { GetServerSideProps } from 'next';
 import FilterBar from '@/components/FilterBar';
 

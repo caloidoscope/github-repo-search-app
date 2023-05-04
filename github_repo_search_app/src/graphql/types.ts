@@ -16,7 +16,7 @@ export interface Repository {
     };
   }
   
-  export interface SearchUser {
+  export interface User {
     avatarUrl: string;
     bio: string | null;
     email: string | null;
